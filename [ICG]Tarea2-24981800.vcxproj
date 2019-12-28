@@ -125,6 +125,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Figure.cpp" />
+    <ClCompile Include="src\Line.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\Quad.cpp" />
+    <ClCompile Include="src\UserInterface.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Dependencies\AntTweakBar\include\AntTweakBar\AntTweakBar.h" />
+    <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3.h" />
+    <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3native.h" />
+    <ClInclude Include="src\Figure.h" />
+    <ClInclude Include="src\Line.h" />
+    <ClInclude Include="src\Main.h" />
+    <ClInclude Include="src\Quad.h" />
+    <ClInclude Include="src\UserInterface.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="Dependencies\AntTweakBar\lib\AntTweakBar.lib" />
+    <Library Include="Dependencies\AntTweakBar\lib\AntTweakBar64.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
