@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../headers/AntTweakBar.h"
+#include <AntTweakBar/AntTweakBar.h>
 #include <iostream>
 #include <string>
 

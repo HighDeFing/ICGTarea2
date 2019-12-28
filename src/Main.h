@@ -1,4 +1,4 @@
-#include "../headers/glfw3.h"
+#include <GLFW/glfw3.h>
 #include <vector>
 
 #define MIN(a,b) (((a)<(b))?(a):(b))

@@ -60,5 +60,7 @@
   <ItemGroup>
     <Library Include="Dependencies\AntTweakBar\lib\AntTweakBar.lib" />
     <Library Include="Dependencies\AntTweakBar\lib\AntTweakBar64.lib" />
+    <Library Include="Dependencies\GLFW\lib-vc2019\glfw3.lib" />
+    <Library Include="Dependencies\GLFW\lib-vc2019\glfw3dll.lib" />
   </ItemGroup>
 </Project>
