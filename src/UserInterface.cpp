@@ -32,8 +32,6 @@ CUserInterface::CUserInterface()
 
 	TwAddVarRO(mUserInterface, "meshType", TW_TYPE_STDSTRING, &mFigureType, "label='Type' readonly=true");
 	TwAddVarRW(mUserInterface, "color", TW_TYPE_COLOR3F, &mFigureColor[0], "label = 'Color'");
-	TwAddVarRW(mUserInterface, "ObjRotation", TW_TYPE_QUAT4F, &g_Rotation,
-		" label='Object rotation' opened=true help='Change the object orientation.' ");
 }
 
 CUserInterface::~CUserInterface()

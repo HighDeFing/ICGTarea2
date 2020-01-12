@@ -2,16 +2,20 @@
 #include "Line.h"
 #include "Quad.h"
 #include "UserInterface.h"
+#include "Bezier.h"
 
 using std::vector;
 
 GLFWwindow *gWindow;
 int gWidth, gHeight;
-bool gPress;
+bool gPress, gbezier, gbezier2;
 CUserInterface * userInterface;
 vector <CFigure *> figures;
 FigureType figureSelected;
 int picked;
+bool first = true; bool second = false; bool third = false; bool newb = true; bool fourth = false; bool fifth = false; bool sexth = false;
+vector <bool *> clicking;
+int click = 0;
 
 void pick(int x, int y)
 {
@@ -65,7 +69,6 @@ void display()
 {
 	glClearColor(1.0f, 1.0f, 1.0f, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
-
 	for (unsigned int i = 0; i < figures.size(); i++)
 		figures[i]->display();
 }
@@ -76,7 +79,7 @@ void reshape(GLFWwindow *window, int width, int height)
 	gHeight = height;
 
 	glViewport(0, 0, gWidth, gHeight);
-
+	glPointSize(3);
 	userInterface->reshape();
 
 	glMatrixMode(GL_PROJECTION);
@@ -97,18 +100,16 @@ void keyInput(GLFWwindow *window, int key, int scancode, int action, int mods)
 		case GLFW_KEY_ESCAPE:
 			glfwSetWindowShouldClose(window, GL_TRUE);
 			break;
-		case GLFW_KEY_I:
-			std::cout << "esto es una prueba \n";
-			break;
 
 		case GLFW_KEY_P:
 			figureSelected = NONE;
 			userInterface->hide();
 			break;
 
-		case GLFW_KEY_L:
-			figureSelected = LINE;
-			userInterface->hide();
+		case GLFW_KEY_B:
+			first = true; second = false; third = false; newb = true;
+			figureSelected = BEZIER;
+			click = 0;
 			break;
 
 		case GLFW_KEY_Q:
@@ -127,6 +128,31 @@ void mouseButton(GLFWwindow* window, int button, int action, int mods)
 	double x, y;
 	glfwGetCursorPos(gWindow, &x, &y);
 
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && first) {
+			float ax = float(x);
+				float ay = gHeight - float(y);
+				CBezier* bezier = new CBezier();
+				bezier->setColor(1.0, 0, 0);
+				bezier->setdColor(0.4157, 0.051, 0.6784);
+				bezier->setlColor(0.0, 0.0, 1.0);
+				bezier->setVertex(0, ax, ay);
+				//bezier->setVertex(1, ax, ay);
+				figures.push_back(bezier);
+				//gPress = true;
+				click = 0;
+				first = false;
+				second = true;
+		}
+
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && second) {
+		//std::cout << "click:"<< click;
+		float ax = float(x);
+		float ay = gHeight - float(y);
+		click++;
+		figures.back()->setClicks(click);
+		figures.back()->setVertex(click, ax, ay);
+	}
+	/*
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && !gPress)
 	{
 		float ax = float(x);
@@ -134,28 +160,34 @@ void mouseButton(GLFWwindow* window, int button, int action, int mods)
 
 		if (figureSelected == NONE)
 			pick(int(ax), int(ay));
-		else if (figureSelected == LINE)
-		{
-			CLine *line = new CLine();
-			line->setVertex(0, ax, ay);
-			line->setVertex(1, ax, ay);
-			figures.push_back(line);
+		if (gbezier) {
+			figures.back()->setVertex(2, ax, ay);
+			gbezier2 = true;
+			gbezier = false;
+			}else if (figureSelected == BEZIER)
+			{
 
-			gPress = true;
-		}
-		else
-		{
-			CQuad *quad = new CQuad();
-			quad->setVertex(0, ax, ay);
-			quad->setVertex(1, ax, ay);
-			figures.push_back(quad);
-
+			CBezier *bezier = new CBezier();
+			bezier->setColor(1.0, 0, 0);
+			bezier->setVertex(0, ax, ay);
+			bezier->setVertex(1, ax, ay);
+			bezier->setVertex(2, ax, ay);
+			bezier->setVertex(3, ax, ay);
+			figures.push_back(bezier);
+			gbezier = true;
 			gPress = true;
 		}
 	}
 
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+			if (gbezier2) {
+				float ax = float(x);
+				float ay = gHeight - float(y);
+				figures.back()->setVertex(3, ax, ay);
+				gbezier2 = false;
+			}
 		gPress = false;
+		}*/
 }
 
 void cursorPos(GLFWwindow* window, double x, double y)
@@ -163,13 +195,22 @@ void cursorPos(GLFWwindow* window, double x, double y)
 	if (TwEventMousePosGLFW(int(x), int(y)))
 		return;
 
-	if (gPress)
+	/*if (gPress)
 	{
 		float ax = float(x);
 		float ay = gHeight - float(y);
-		std::cout << "ax   " << ax << "ay    " << ay << std::endl;
+		if(first)
 		figures.back()->setVertex(1, ax, ay);
-	}
+		if (second) {
+			figures.back()->setVertex(2, ax, ay);
+		}
+		/*if (third) {
+			figures.back()->setVertex(3, ax, ay);
+		}
+		
+	}*/
+	
+	
 }
 
 void charInput(GLFWwindow* window, unsigned int scanChar)
@@ -231,7 +272,7 @@ int main(void)
 	gWidth = 1200;
 	gHeight = 680;
 	gPress = false;
-	figureSelected = LINE;
+	figureSelected = BEZIER;
 	picked = -1;
 
 	if (!initGlfw() || !initUserInterface())

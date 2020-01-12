@@ -24,6 +24,30 @@ void CFigure::setColor(float r, float g, float b)
 	mColor[2] = b;
 }
 
+void CFigure::setdColor(float r, float g, float b)
+{
+	dColor[0] = r;
+	dColor[1] = g;
+	dColor[2] = b;
+}
+
+void CFigure::setlColor(float r, float g, float b)
+{
+	lColor[0] = r;
+	lColor[1] = g;
+	lColor[2] = b;
+}
+
+void CFigure::setClicks(int c)
+{
+	clicks = c;
+}
+
+int CFigure::getClicks()
+{
+	return clicks;
+}
+
 int CFigure::getType()
 {
 	return mType;
