@@ -62,3 +62,16 @@ float* CFigure::getColor()
 {
 	return mColor;
 }
+
+void CFigure::FiguresetbPick(bool x) {
+	bPick = x;
+}
+
+bool CFigure::FiguregetbPick(bool x) 
+{
+	return bPick;
+}
+
+std::vector<CFigure::Puntos> CFigure::getControlPPoints() {
+	return ControlPoints;
+}

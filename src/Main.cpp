@@ -3,6 +3,7 @@
 #include "Quad.h"
 #include "UserInterface.h"
 #include "Bezier.h"
+#include "Figure.h"
 
 using std::vector;
 
@@ -20,37 +21,23 @@ int click = 0;
 void pick(int x, int y)
 {
 	picked = -1;
-	userInterface->hide();
+	//userInterface->hide();
 
 	for (unsigned int i = 0; i < figures.size(); i++)
 	{
-		float *v1 = figures[i]->getVertex(0);
-		float *v2 = figures[i]->getVertex(1);
-		float max[2];
-		float min[2];
-
-		// This should be precalculated
-
-		max[0] = MAX(v1[0], v2[0]);
-		max[1] = MAX(v1[1], v2[1]);
-
-		min[0] = MIN(v1[0], v2[0]);
-		min[1] = MIN(v1[1], v2[1]);
-
+		
+		float max[2], min[2]; //max[0]=x max[1]=y min[0]=x min[1]=y
+		max[0] = figures[i]->maxf[0];
+		max[1] = figures[i]->maxf[1];
+		min[0] = figures[i]->minf[0];
+		min[1] = figures[i]->minf[1];
 		if (x >= min[0] && x <= max[0] && y >= min[1] && y <= max[1])
 		{
 			picked = i;
-
 			userInterface->setFigureColor(figures[picked]->getColor());
 			userInterface->show();
-
 			int type = figures[picked]->getType();
-
-			if (type == LINE)
-				userInterface->setFigureType("Line");
-			else
-				userInterface->setFigureType("Quad");
-
+			figures[picked]->FiguresetbPick(true);
 			break;
 		}
 	}
@@ -92,7 +79,10 @@ void keyInput(GLFWwindow *window, int key, int scancode, int action, int mods)
 {
 	if (TwEventKeyGLFW(key, action))
 		return;
-
+	double x, y;
+	glfwGetCursorPos(gWindow, &x, &y);
+	float ax = float(x);
+	float ay = gHeight - float(y);
 	if (action == GLFW_PRESS)
 	{
 		switch (key)
@@ -102,8 +92,9 @@ void keyInput(GLFWwindow *window, int key, int scancode, int action, int mods)
 			break;
 
 		case GLFW_KEY_P:
+			first = false; second = false; third = false; newb = true;
+			pick(int(ax), int(ay));
 			figureSelected = NONE;
-			userInterface->hide();
 			break;
 
 		case GLFW_KEY_B:
@@ -128,7 +119,14 @@ void mouseButton(GLFWwindow* window, int button, int action, int mods)
 	double x, y;
 	glfwGetCursorPos(gWindow, &x, &y);
 
-		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && first) {
+
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && figureSelected == NONE) {
+			float ax = float(x);
+			float ay = gHeight - float(y);
+			pick(int(ax), int(ay));
+		}
+
+		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && first && figureSelected == BEZIER) {
 			float ax = float(x);
 				float ay = gHeight - float(y);
 				CBezier* bezier = new CBezier();
@@ -136,15 +134,16 @@ void mouseButton(GLFWwindow* window, int button, int action, int mods)
 				bezier->setdColor(0.4157, 0.051, 0.6784);
 				bezier->setlColor(0.0, 0.0, 1.0);
 				bezier->setVertex(0, ax, ay);
-				//bezier->setVertex(1, ax, ay);
+				bezier->setVertex(1, ax, ay);
 				figures.push_back(bezier);
+				userInterface->setFigureType("Bezier");
 				//gPress = true;
 				click = 0;
 				first = false;
 				second = true;
 		}
 
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && second) {
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && second && figureSelected == BEZIER) {
 		//std::cout << "click:"<< click;
 		float ax = float(x);
 		float ay = gHeight - float(y);
