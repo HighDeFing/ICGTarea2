@@ -11,6 +11,7 @@
 class CBezier : public CFigure
 {
 	public:
+	CBezier* Curva = this;
 	int clicks;
 	CBezier();
 	~CBezier();
@@ -20,5 +21,6 @@ class CBezier : public CFigure
 	void drawPixel(int, int);
 	void draw_rectangle(int x1, int x2, int y1, int y2);
 	void display();
+	std::vector<CFigure::Puntos> Elevar_Grado();
 	void createBezier();
 };

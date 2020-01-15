@@ -4,13 +4,16 @@
 #include "UserInterface.h"
 #include "Bezier.h"
 #include "Figure.h"
+#include "EditInterface.h"
 
 using std::vector;
 
 GLFWwindow *gWindow;
 int gWidth, gHeight;
+bool ispicked;
 bool gPress, gbezier, gbezier2;
 CUserInterface * userInterface;
+CEditInterface * editInterface;
 vector <CFigure *> figures;
 FigureType figureSelected;
 int picked;
@@ -21,11 +24,13 @@ int click = 0;
 void pick(int x, int y)
 {
 	picked = -1;
+	ispicked = false;
 	//userInterface->hide();
-
+	editInterface->show();
+	editInterface->setBox(false);
 	for (unsigned int i = 0; i < figures.size(); i++)
 	{
-		
+		figures[i]->Figuresetbox(false);
 		float max[2], min[2]; //max[0]=x max[1]=y min[0]=x min[1]=y
 		max[0] = figures[i]->maxf[0];
 		max[1] = figures[i]->maxf[1];
@@ -33,11 +38,14 @@ void pick(int x, int y)
 		min[1] = figures[i]->minf[1];
 		if (x >= min[0] && x <= max[0] && y >= min[1] && y <= max[1])
 		{
+
 			picked = i;
+			ispicked = true;
 			userInterface->setFigureColor(figures[picked]->getColor());
 			userInterface->show();
 			int type = figures[picked]->getType();
-			figures[picked]->FiguresetbPick(true);
+			editInterface->setBox(true);
+			figures[picked]->Figuresetbox(true);
 			break;
 		}
 	}
@@ -50,6 +58,47 @@ void updateUserInterface()
 		float * color = userInterface->getFigureColor();
 		figures[picked]->setColor(color[0], color[1], color[2]);
 	}
+}
+
+void updateEditInterface() {
+	if (picked > -1 && ispicked)
+	{
+		editInterface->show();  //Show edit interface when clicked
+		/*float* ecolor = editInterface->getFigureColor();
+		figures[picked]->setColor(ecolor[0], ecolor[1], ecolor[2]); //line color
+
+		float* fcolor = editInterface->getFigureFColor();
+		figures[picked]->setfColor(fcolor[0], fcolor[1], fcolor[2]); //fill color
+		*/
+
+		//editInterface->setFill(figures[picked]->getbfill()); //set if fill don't know why it works but it works lmao.
+		figures[picked]->setbElevarGrado(editInterface->getbElevarGrado());
+		figures[picked]->Figuresetbox(editInterface->getBox()); //set if bounding box
+
+	}
+	else if (!ispicked && picked < -1) {
+		editInterface->hide(); //hide edit interface when not cliking on a figure
+		editInterface->setFigureType(NONE);
+	}
+	if (picked > -1) {
+		float* ecolor = editInterface->getFigureColor();
+		figures[picked]->setColor(ecolor[0], ecolor[1], ecolor[2]); //line color
+
+		float* fcolor = editInterface->getFigureFColor();
+		//figures[picked]->setfColor(fcolor[0], fcolor[1], fcolor[2]); //fill color
+
+		//figures[picked]->Figuresetfill(editInterface->getFill()); //set if fill but only on one figure properties.
+
+		figures[picked]->Figuresetbox(editInterface->getBox()); //set if bounding box
+		editInterface->getbElevarGrado();
+		editInterface->setbElevarGrado(figures[picked]->getbElevarGrado());
+		figures[picked]->setbElevarGrado(editInterface->getbElevarGrado());
+	}
+	else {
+		editInterface->hide(); //hide edit interface when not cliking on a figure
+		editInterface->setFigureType(NONE);
+	}
+
 }
 
 void display()
@@ -133,10 +182,12 @@ void mouseButton(GLFWwindow* window, int button, int action, int mods)
 				bezier->setColor(1.0, 0, 0);
 				bezier->setdColor(0.4157, 0.051, 0.6784);
 				bezier->setlColor(0.0, 0.0, 1.0);
+				bezier->setbColor(0, 255, 255);
 				bezier->setVertex(0, ax, ay);
 				bezier->setVertex(1, ax, ay);
 				figures.push_back(bezier);
 				userInterface->setFigureType("Bezier");
+				editInterface->setFigureColor(bezier->getColor());
 				//gPress = true;
 				click = 0;
 				first = false;
@@ -262,6 +313,7 @@ bool initUserInterface()
 	if (!TwInit(TW_OPENGL, NULL))
 		return false;
 
+	editInterface = CEditInterface::Instance();
 	userInterface = CUserInterface::Instance();
 	return true;
 }
@@ -290,6 +342,7 @@ int main(void)
 		TwDraw();
 
 		updateUserInterface();
+		updateEditInterface();
 
 		glfwSwapBuffers(gWindow);
 

@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Bezier.cpp" />
+    <ClCompile Include="src\EditInterface.cpp" />
     <ClCompile Include="src\Figure.cpp" />
     <ClCompile Include="src\Line.cpp" />
     <ClCompile Include="src\Main.cpp" />
@@ -142,6 +143,7 @@
     <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3.h" />
     <ClInclude Include="Dependencies\GLFW\include\GLFW\glfw3native.h" />
     <ClInclude Include="src\Bezier.h" />
+    <ClInclude Include="src\EditInterface.h" />
     <ClInclude Include="src\Figure.h" />
     <ClInclude Include="src\Line.h" />
     <ClInclude Include="src\Main.h" />

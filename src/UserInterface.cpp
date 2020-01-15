@@ -28,7 +28,7 @@ CUserInterface::CUserInterface()
 	TwDefine("Figure movable = false");
 	TwDefine("Figure visible = true");
 	TwDefine("Figure position = '20 20'");
-	TwDefine("Figure size = '220 320'");
+	TwDefine("Figure size = '220 250'");
 
 	TwAddVarRO(mUserInterface, "meshType", TW_TYPE_STDSTRING, &mFigureType, "label='Type' readonly=true");
 	TwAddVarRW(mUserInterface, "color", TW_TYPE_COLOR3F, &mFigureColor[0], "label = 'Color'");

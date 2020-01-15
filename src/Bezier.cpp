@@ -21,7 +21,6 @@ CBezier::CBezier()
 	mVertices = new float* [100];
 	for (int i = 0; i < 100; ++i)
 		mVertices[i] = new float[100];
-
 	mType = BEZIER;
 }
 
@@ -39,6 +38,11 @@ void CBezier::drawDot(int x, int y)
 	glEnd();
 }
 
+static bool abs_compare(int a, int b)
+{
+	return (std::abs(a) < std::abs(b));
+}
+
 void CBezier::display()
 {
 
@@ -49,6 +53,7 @@ void CBezier::display()
 	y1 = mVertices[0][1]; y2 = mVertices[1][1]; y3 = mVertices[2][1];
 	
 	std::vector<Puntos> C;
+	std::vector<Puntos> Celev;
 	/*Puntos* rev = new Puntos();
 	rev->setxy(mVertices[0][0], mVertices[0][1]);
 	C.push_back(*rev);
@@ -73,6 +78,15 @@ void CBezier::display()
 	glColor3fv(mColor);
 	//glLineStipple(1, 0xEFEF);
 	//glEnable(GL_LINE_STIPPLE);
+	if (bElevarGrado) {
+		Celev = Elevar_Grado();
+		bElevarGrado = false;
+		C = Celev;
+		GradoElevado = true;
+	}
+	if (GradoElevado) {
+		C = Celev;
+	}
 	glBegin(GL_LINE_STRIP);
 		for (double t = 0.0; t <= 1.0; t += paso)
 		{
@@ -105,8 +119,8 @@ void CBezier::display()
 			min[1] = MIN(min[1], MIN(ControlPoints[i].y, ControlPoints[j].y));
 		}
 	}
-	minf[0] = min[0]; minf[1] = minf[1]; maxf[0] = max[0]; maxf[1] = max[1];
-	if (bPick) {
+	minf[0] = min[0]; minf[1] = min[1]; maxf[0] = max[0]; maxf[1] = max[1];
+	if (bbox) {
 		draw_rectangle(min[0], max[0], min[1], max[1]);
 	}
 }
@@ -116,6 +130,25 @@ void CBezier::boundingbox()
 }
 
 void  CBezier::createBezier() {
+
+}
+
+std::vector<CFigure::Puntos> CBezier::Elevar_Grado()
+{
+	std::vector<Puntos> PuntosNuevo;
+	int NumeroVertices = getClicks();
+	float *bn = Curva->getVertex(getClicks() - 1);
+	Curva->setVertex(getClicks() - 1,bn[0], bn[1]);
+	float* bjA, *bj;
+	for (int j = 0; j < getClicks() - 1; j++)
+	{
+		bjA = Curva->getVertex(j);
+		bj = Curva->getVertex(j + 1);
+		Puntos* aux = new Puntos();
+		aux->setxy((((j / NumeroVertices) * bjA[0]) + ((1 - (j / NumeroVertices)) * bj[0])), (((j / NumeroVertices) * bjA[1]) + ((1 - (j / NumeroVertices)) * bj[1])));
+		PuntosNuevo.push_back(*aux);
+	}
+	return PuntosNuevo;
 
 }
 
@@ -151,7 +184,7 @@ void CBezier::drawPixel(int x, int y)
 }*/
 
 void  CBezier::draw_rectangle(int x1, int x2, int y1, int y2) {
-	glColor3fv(lColor);
+	glColor3fv(bColor);
 	glBegin(GL_LINE_LOOP);
 	glVertex2f(x1, y1);
 	glVertex2f(x2, y1);

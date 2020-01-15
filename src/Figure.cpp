@@ -63,15 +63,36 @@ float* CFigure::getColor()
 	return mColor;
 }
 
-void CFigure::FiguresetbPick(bool x) {
-	bPick = x;
+void CFigure::Figuresetbox(bool x) {
+	bbox = x;
 }
 
-bool CFigure::FiguregetbPick(bool x) 
+
+
+void  CFigure::setbColor(float r, float g, float b)
 {
-	return bPick;
+	bColor[0] = r;
+	bColor[1] = g;
+	bColor[2] = b;
 }
 
 std::vector<CFigure::Puntos> CFigure::getControlPPoints() {
 	return ControlPoints;
+}
+
+void CFigure::setbElevarGrado(bool x)
+{
+	bElevarGrado = x;
+}
+bool CFigure::getbElevarGrado()
+{
+	return bElevarGrado;
+}
+void CFigure::setGradoElevado(bool x)
+{
+	GradoElevado = x;
+}
+bool CFigure::getGradoElevado()
+{
+	return GradoElevado;
 }

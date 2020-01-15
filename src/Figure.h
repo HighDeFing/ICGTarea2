@@ -16,10 +16,12 @@ enum FigureType
 class CFigure
 {
 protected:
-	float **mVertices, mColor[3], dColor[3], lColor[3];
+	float **mVertices, mColor[3], dColor[3], lColor[3], bColor[3];
 	int mType;
 	int clicks;
-	bool bPick;
+	bool bbox = false;
+	bool bElevarGrado = false;
+	bool GradoElevado = false;
 
 public:
 	class Puntos {
@@ -39,17 +41,21 @@ public:
 		}
 
 	};
-	std::vector<Puntos> ControlPoints;
+	std::vector<Puntos> ControlPoints; //Puntos de control es global
 	CFigure();
 	virtual ~CFigure();
 	float maxf[2], minf[2];
+	void setbElevarGrado(bool);
+	bool getbElevarGrado();
+	void setGradoElevado(bool);
+	bool getGradoElevado();
 	void setdColor(float r, float g, float b);
 	void setlColor(float r, float g, float b);
+	void setbColor(float r, float g, float b);
 	void setVertex(int id, float x, float y);
 	void setColor(float r, float g, float b);
 	void setClicks(int);
-	void FiguresetbPick(bool x);
-	bool FiguregetbPick(bool x);
+	void Figuresetbox(bool x);
 	std::vector<Puntos> getControlPPoints();
 	virtual void boundingbox() = 0;
 	virtual void display() = 0;
