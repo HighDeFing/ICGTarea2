@@ -1,8 +1,10 @@
 #include "EditInterface.h"
 #include "Figure.h"
 #include "Quad.h"
-extern int gWidth, gHeight;
+#include "Bezier.h"
 
+extern int gWidth, gHeight;
+extern void TW_CALL e_ElevarGrado(void* );
 // Global static pointer used to ensure a single instance of the class.
 CEditInterface* CEditInterface::mInterface = NULL;
 
@@ -19,11 +21,6 @@ CEditInterface* CEditInterface::Instance()
 	return mInterface;
 }
 
-void TW_CALL e_ElevarGrado(void* /*clientData*/)
-{
-	CEditInterface* auxEditInterface = CEditInterface::Instance();
-	auxEditInterface->setbElevarGrado(true);
-}
 
 CEditInterface::CEditInterface()
 {
@@ -45,6 +42,7 @@ CEditInterface::CEditInterface()
 
 	TwAddVarRO(mEditInterface, "meshType", TW_TYPE_STDSTRING, &mFigureType, "label='Type' readonly=true");
 	TwAddVarRW(mEditInterface, "color", TW_TYPE_COLOR3F, &mFigureColor[0], "label = 'Color'");
+	TwAddVarRW(mEditInterface, "Line colors", TW_TYPE_COLOR3F, &fFigureColor[0], "label = 'Line Color'");
 	//TwAddVarRW(mEditInterface, "Fill color", TW_TYPE_COLOR3F, &fFigureColor[0], "label = 'Fill color'");
 	//TwAddVarRW(mEditInterface, "relleno", TW_TYPE_BOOLCPP, &bfill, "label = 'Fill?'");
 	TwAddVarRW(mEditInterface, "bounding box", TW_TYPE_BOOLCPP, &bbox, "label = 'Bounding box?'");
@@ -117,19 +115,3 @@ void CEditInterface::setFColor(float* color)
 	fFigureColor[2] = color[2];
 }
 
-void CEditInterface::setbElevarGrado(bool x)
-{
-	bElevarGrado = x;
-}
-bool CEditInterface::getbElevarGrado()
-{
-	return bElevarGrado;
-}
-void CEditInterface::setGradoElevado(bool x)
-{
-	GradoElevado = x;
-}
-bool CEditInterface::getGradoElevado()
-{
-	return GradoElevado;
-}

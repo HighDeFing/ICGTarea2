@@ -1,5 +1,5 @@
 #include "UserInterface.h"
-
+#include "Figure.h"
 extern int gWidth, gHeight;
 
 // Global static pointer used to ensure a single instance of the class.
@@ -30,7 +30,11 @@ CUserInterface::CUserInterface()
 	TwDefine("Figure position = '20 20'");
 	TwDefine("Figure size = '220 250'");
 
-	TwAddVarRO(mUserInterface, "meshType", TW_TYPE_STDSTRING, &mFigureType, "label='Type' readonly=true");
+	mFigureType = TwDefineEnum("mFigureType", mFigureType_enumEV, 2);
+
+	TwAddVarRW(mUserInterface, "Figure", mFigureType, &figuretype, "label='Type'");
+
+	//TwAddVarRO(mUserInterface, "meshType", TW_TYPE_STDSTRING, &mFigureType, "label='Type' readonly=true");
 	TwAddVarRW(mUserInterface, "color", TW_TYPE_COLOR3F, &mFigureColor[0], "label = 'Color'");
 }
 
@@ -53,6 +57,11 @@ void CUserInterface::hide()
 	TwDefine("Figure visible = false");
 }
 
+FigureType CUserInterface::getFigureType()
+{
+	return figuretype;
+}
+
 void CUserInterface::setFigureColor(float *color)
 {
 	mFigureColor[0] = color[0];
@@ -60,9 +69,9 @@ void CUserInterface::setFigureColor(float *color)
 	mFigureColor[2] = color[2];
 }
 
-void CUserInterface::setFigureType(string type)
+void CUserInterface::setFigureType(FigureType type)
 {
-	mFigureType = type;
+	figuretype = type;
 }
 
 float* CUserInterface::getFigureColor()

@@ -16,7 +16,9 @@ CUserInterface * userInterface;
 CEditInterface * editInterface;
 vector <CFigure *> figures;
 FigureType figureSelected;
+
 int picked;
+int pickedver;
 bool first = true; bool second = false; bool third = false; bool newb = true; bool fourth = false; bool fifth = false; bool sexth = false;
 vector <bool *> clicking;
 int click = 0;
@@ -24,10 +26,14 @@ int click = 0;
 void pick(int x, int y)
 {
 	picked = -1;
+	pickedver = -1;
+
 	ispicked = false;
 	//userInterface->hide();
 	editInterface->show();
 	editInterface->setBox(false);
+	float *ver;
+
 	for (unsigned int i = 0; i < figures.size(); i++)
 	{
 		figures[i]->Figuresetbox(false);
@@ -38,7 +44,7 @@ void pick(int x, int y)
 		min[1] = figures[i]->minf[1];
 		if (x >= min[0] && x <= max[0] && y >= min[1] && y <= max[1])
 		{
-
+			
 			picked = i;
 			ispicked = true;
 			userInterface->setFigureColor(figures[picked]->getColor());
@@ -46,6 +52,17 @@ void pick(int x, int y)
 			int type = figures[picked]->getType();
 			editInterface->setBox(true);
 			figures[picked]->Figuresetbox(true);
+			figures[picked]->setbFirst(false);
+			for (unsigned int i = 0; i < figures[picked]->ControlPoints.size(); i++)
+			{
+				ver = figures[picked]->getVertex(i);
+				figures[picked]->ColorVertex(i, false);
+				if (x >= ver[0] - 5 && x<=ver[0]+5 && y >= ver[1] - 5 && y<=ver[1] + 5)
+				{
+					pickedver = i;
+					figures[picked]->ColorVertex(i, true);
+				}
+			}
 			break;
 		}
 	}
@@ -72,7 +89,6 @@ void updateEditInterface() {
 		*/
 
 		//editInterface->setFill(figures[picked]->getbfill()); //set if fill don't know why it works but it works lmao.
-		figures[picked]->setbElevarGrado(editInterface->getbElevarGrado());
 		figures[picked]->Figuresetbox(editInterface->getBox()); //set if bounding box
 
 	}
@@ -85,14 +101,11 @@ void updateEditInterface() {
 		figures[picked]->setColor(ecolor[0], ecolor[1], ecolor[2]); //line color
 
 		float* fcolor = editInterface->getFigureFColor();
-		//figures[picked]->setfColor(fcolor[0], fcolor[1], fcolor[2]); //fill color
+		figures[picked]->setlColor(fcolor[0], fcolor[1], fcolor[2]); //fill color
 
 		//figures[picked]->Figuresetfill(editInterface->getFill()); //set if fill but only on one figure properties.
 
 		figures[picked]->Figuresetbox(editInterface->getBox()); //set if bounding box
-		editInterface->getbElevarGrado();
-		editInterface->setbElevarGrado(figures[picked]->getbElevarGrado());
-		figures[picked]->setbElevarGrado(editInterface->getbElevarGrado());
 	}
 	else {
 		editInterface->hide(); //hide edit interface when not cliking on a figure
@@ -115,7 +128,7 @@ void reshape(GLFWwindow *window, int width, int height)
 	gHeight = height;
 
 	glViewport(0, 0, gWidth, gHeight);
-	glPointSize(3);
+	glPointSize(5);
 	userInterface->reshape();
 
 	glMatrixMode(GL_PROJECTION);
@@ -151,12 +164,20 @@ void keyInput(GLFWwindow *window, int key, int scancode, int action, int mods)
 			figureSelected = BEZIER;
 			click = 0;
 			break;
-
-		case GLFW_KEY_Q:
-			figureSelected = QUAD;
-			userInterface->hide();
-			break;
+		case GLFW_KEY_DELETE:
+			if (picked > -1) {
+				if (pickedver > -1) {
+					figures[picked]->deleteVertex(pickedver);
+				}
+			}
 		}
+	}
+}
+
+void TW_CALL e_ElevarGrado(void* /*clientData*/)
+{
+	if (picked > -1) {
+		figures[picked]->Elevar_Grado();
 	}
 }
 
@@ -172,27 +193,33 @@ void mouseButton(GLFWwindow* window, int button, int action, int mods)
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && figureSelected == NONE) {
 			float ax = float(x);
 			float ay = gHeight - float(y);
+			first = false; second = false; third = false; newb = true;
+			userInterface->setFigureType(NONE);
+			figureSelected = NONE;
 			pick(int(ax), int(ay));
 		}
 
 		if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && first && figureSelected == BEZIER) {
 			float ax = float(x);
-				float ay = gHeight - float(y);
-				CBezier* bezier = new CBezier();
-				bezier->setColor(1.0, 0, 0);
-				bezier->setdColor(0.4157, 0.051, 0.6784);
-				bezier->setlColor(0.0, 0.0, 1.0);
-				bezier->setbColor(0, 255, 255);
-				bezier->setVertex(0, ax, ay);
-				bezier->setVertex(1, ax, ay);
-				figures.push_back(bezier);
-				userInterface->setFigureType("Bezier");
-				editInterface->setFigureColor(bezier->getColor());
-				//gPress = true;
-				click = 0;
-				first = false;
-				second = true;
+			float ay = gHeight - float(y);
+			CBezier* bezier = new CBezier();
+			bezier->setColor(1.0, 0, 0);
+			bezier->setdColor(0.4157, 0.051, 0.6784);
+			bezier->setdsColor(0.61, 0.53, 0.05);
+			bezier->setlColor(0.0, 0.0, 1.0);
+			bezier->setbColor(0, 255, 255);
+			bezier->setVertex(0, ax, ay);
+			bezier->setVertex(1, ax, ay);
+			figures.push_back(bezier);
+			userInterface->setFigureType(BEZIER);
+			editInterface->setFigureColor(bezier->getColor());
+			editInterface->setFColor(bezier->getlColor());
+			//gPress = true;
+			click = 0;
+			first = false;
+			second = true;
 		}
+		else figureSelected = userInterface->getFigureType();
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS && second && figureSelected == BEZIER) {
 		//std::cout << "click:"<< click;

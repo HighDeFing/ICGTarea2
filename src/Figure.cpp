@@ -11,6 +11,16 @@ CFigure::~CFigure()
 	delete[] mVertices;
 }
 
+void CFigure::setbFirst(bool x)
+{
+	bFirst = x;
+}
+
+bool CFigure::getbFirst()
+{
+	return bFirst;
+}
+
 void CFigure::setVertex(int id, float x, float y)
 {
 	mVertices[id][0] = x;
@@ -31,11 +41,28 @@ void CFigure::setdColor(float r, float g, float b)
 	dColor[2] = b;
 }
 
+void CFigure::setdsColor(float r, float g, float b)
+{
+	dsColor[0] = r;
+	dsColor[1] = g;
+	dsColor[2] = b;
+}
+
+float* CFigure::getdsColor()
+{
+	return dsColor;
+}
+
 void CFigure::setlColor(float r, float g, float b)
 {
 	lColor[0] = r;
 	lColor[1] = g;
 	lColor[2] = b;
+}
+
+float* CFigure::getlColor()
+{
+	return lColor;
 }
 
 void CFigure::setClicks(int c)
@@ -78,21 +105,4 @@ void  CFigure::setbColor(float r, float g, float b)
 
 std::vector<CFigure::Puntos> CFigure::getControlPPoints() {
 	return ControlPoints;
-}
-
-void CFigure::setbElevarGrado(bool x)
-{
-	bElevarGrado = x;
-}
-bool CFigure::getbElevarGrado()
-{
-	return bElevarGrado;
-}
-void CFigure::setGradoElevado(bool x)
-{
-	GradoElevado = x;
-}
-bool CFigure::getGradoElevado()
-{
-	return GradoElevado;
 }

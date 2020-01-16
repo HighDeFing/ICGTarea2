@@ -38,6 +38,29 @@ void CBezier::drawDot(int x, int y)
 	glEnd();
 }
 
+void CBezier::drawSelectDot(int x, int y)
+{
+	glColor3fv(dsColor);
+	glBegin(GL_POINTS);
+	glVertex2i(x, y);
+	glEnd();
+	glFlush();
+}
+
+void CBezier::ColorVertex(int id, bool x)
+{
+	ControlPoints[id].selected = x;
+}
+
+void CBezier::deleteVertex(int id)
+{
+	if (ControlPoints[id].selected)
+	{
+		//ControlPoints[id].selected = false;
+		ControlPoints.erase(ControlPoints.begin() + id);
+	}
+}
+
 static bool abs_compare(int a, int b)
 {
 	return (std::abs(a) < std::abs(b));
@@ -46,51 +69,47 @@ static bool abs_compare(int a, int b)
 void CBezier::display()
 {
 
-	int xa, ya, xb, yb;
-	int x1, x2, x3, y1, y2, y3;
-	int x, y;
-	x1 = mVertices[0][0]; x2 = mVertices[1][0]; x3 = mVertices[2][0];
-	y1 = mVertices[0][1]; y2 = mVertices[1][1]; y3 = mVertices[2][1];
-	
-	std::vector<Puntos> C;
-	std::vector<Puntos> Celev;
-	/*Puntos* rev = new Puntos();
-	rev->setxy(mVertices[0][0], mVertices[0][1]);
-	C.push_back(*rev);
-	drawDot(C[0].x, C[0].y);*/
-	for (int i = 0; i <= getClicks(); i++)
-	{
-		Puntos *aux = new Puntos();
-		Puntos* aux1 = new Puntos();
-		aux->setxy(mVertices[i][0], mVertices[i][1]);
-		aux1->setxy(mVertices[i][0], mVertices[i][1]);
-		ControlPoints.push_back(*aux1);
-		C.push_back(*aux);
-		//C[i].x = mVertices[i][0];
-		//C[i].y = mVertices[i][1];
-		drawDot(C[i].x, C[i].y);
-		if (i > 0)
-			drawLine(C[i].x, C[i].y, C[i - 1].x, C[i - 1].y);
-	}
 	float VertXY1[2];
-	int NumeroVertices = C.size();
 	double paso = 0.001;
-	glColor3fv(mColor);
+	std::vector<Puntos> C;
+	std::vector<Puntos> Caux;
+	int NumeroVertices = 0;
+	if (bFirst) {
+		for (int i = 0; i <= getClicks(); i++)
+		{
+			Puntos* aux = new Puntos();
+			aux->setxy(mVertices[i][0], mVertices[i][1]);
+			C.push_back(*aux);
+		}
+		ControlPoints = C;
+	}
+	else {
+		for (int i = 0; i <= ControlPoints.size(); i++)
+		{
+			Puntos* aux = new Puntos();
+			aux->setxy(mVertices[i][0], mVertices[i][1]);
+			C.push_back(*aux);
+		}
+	}
 	//glLineStipple(1, 0xEFEF);
 	//glEnable(GL_LINE_STIPPLE);
-	if (bElevarGrado) {
-		Celev = Elevar_Grado();
-		bElevarGrado = false;
-		C = Celev;
-		GradoElevado = true;
+	NumeroVertices = ControlPoints.size();
+	//std::cout << ControlPoints.size() << std::endl;
+	for (int i = 0; i <= NumeroVertices - 1; i++) {
+		drawDot(ControlPoints[i].x, ControlPoints[i].y);
+		if (ControlPoints[i].getSelected())
+		{
+			drawSelectDot(ControlPoints[i].x, ControlPoints[i].y);
+		}
+		if (i > 0) {
+			drawLine(ControlPoints[i].x, ControlPoints[i].y, ControlPoints[i - 1].x, ControlPoints[i - 1].y);
+		}
 	}
-	if (GradoElevado) {
-		C = Celev;
-	}
+	glColor3fv(mColor);
 	glBegin(GL_LINE_STRIP);
 		for (double t = 0.0; t <= 1.0; t += paso)
 		{
-			//ControlPoints = C;
+			C = ControlPoints;
 			for (int r = 0; r < (NumeroVertices - 1); r++) 
 			{
 				for (int i = 0; i < ((NumeroVertices - 1) - r); i++)
@@ -110,7 +129,7 @@ void CBezier::display()
 	max[1] = ControlPoints[0].y;
 	min[0] = ControlPoints[0].x;
 	min[1] = ControlPoints[0].y;
-	//std::cout << ControlPoints.size();
+	//std::cout << ControlPoints.size() << std::endl;
 	for (int i = 0; i < ControlPoints.size(); i++) {
 		for (int j = 0; j < ControlPoints.size(); j++) {
 			max[0] = MAX(max[0], MAX(ControlPoints[i].x, ControlPoints[j].x));
@@ -119,6 +138,7 @@ void CBezier::display()
 			min[1] = MIN(min[1], MIN(ControlPoints[i].y, ControlPoints[j].y));
 		}
 	}
+	//std::cout << min[0] << std::endl;
 	minf[0] = min[0]; minf[1] = min[1]; maxf[0] = max[0]; maxf[1] = max[1];
 	if (bbox) {
 		draw_rectangle(min[0], max[0], min[1], max[1]);
@@ -133,22 +153,34 @@ void  CBezier::createBezier() {
 
 }
 
-std::vector<CFigure::Puntos> CBezier::Elevar_Grado()
+void CBezier::Elevar_Grado()
 {
 	std::vector<Puntos> PuntosNuevo;
-	int NumeroVertices = getClicks();
-	float *bn = Curva->getVertex(getClicks() - 1);
-	Curva->setVertex(getClicks() - 1,bn[0], bn[1]);
-	float* bjA, *bj;
-	for (int j = 0; j < getClicks() - 1; j++)
+	float NumeroVertices = ControlPoints.size();
+	float *bn = this->getVertex(ControlPoints.size() - 1);
+	float *b0 = this->getVertex(0);
+	this->setVertex(ControlPoints.size() - 1,bn[0], bn[1]); //the last
+	this->setVertex(0, b0[0], b0[1]); //first vertex
+	float *bjA, *bj;
+	Puntos* aux = new Puntos();
+	aux->setxy(b0[0], b0[1]);
+	PuntosNuevo.push_back(*aux); //the point
+	for (float j = 0; j < NumeroVertices - 1; j++)
 	{
-		bjA = Curva->getVertex(j);
-		bj = Curva->getVertex(j + 1);
+		bjA = this->getVertex(j);
+		bj = this->getVertex(j + 1);
 		Puntos* aux = new Puntos();
-		aux->setxy((((j / NumeroVertices) * bjA[0]) + ((1 - (j / NumeroVertices)) * bj[0])), (((j / NumeroVertices) * bjA[1]) + ((1 - (j / NumeroVertices)) * bj[1])));
+		aux->setxy((((j / NumeroVertices) * bjA[0]) + ((1 - (j / NumeroVertices)) * bj[0])), (((j / NumeroVertices) * bjA[1]) + (((1 - (j / NumeroVertices)) * bj[1]))));
 		PuntosNuevo.push_back(*aux);
+		this->setVertex(j,PuntosNuevo[j].getPointx(), PuntosNuevo[j].getPointy());
 	}
-	return PuntosNuevo;
+	Puntos* last = new Puntos();
+	last->setxy(bn[0], bn[1]);
+	PuntosNuevo.push_back(*last);
+	this->setVertex(PuntosNuevo.size() - 1, PuntosNuevo[PuntosNuevo.size() - 1].getPointx(), PuntosNuevo[PuntosNuevo.size() - 1].getPointy());
+	std::cout << PuntosNuevo.size() - 2 << " " << PuntosNuevo[PuntosNuevo.size() - 2].getPointx() << " " << PuntosNuevo[PuntosNuevo.size() - 2].getPointy() << std::endl;
+	//std::cout << PuntosNuevo.size() << std::endl;
+	ControlPoints = PuntosNuevo;
 
 }
 

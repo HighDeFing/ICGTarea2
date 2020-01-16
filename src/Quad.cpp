@@ -6,7 +6,7 @@ CQuad::CQuad()
 	for (int i = 0; i < 2; ++i)
 		mVertices[i] = new float[2];
 
-	mType = QUAD;
+	mType = BEZIER;
 }
 
 CQuad::~CQuad()

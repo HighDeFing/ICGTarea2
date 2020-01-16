@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include "Figure.h"
+#include <vector>
 
 using std::string;
 
@@ -28,6 +29,7 @@ private:
 
 public:
 	///Method to obtain the only instance of the calls
+	CFigure *figure;
 	static CEditInterface* Instance();
 	~CEditInterface();
 	void reshape();
@@ -41,10 +43,6 @@ public:
 	float* getFigureFColor();
 	FigureType getFigureSelected();
 	bool getBox();
-	void setbElevarGrado(bool);
-	bool getbElevarGrado();
-	void setGradoElevado(bool);
-	bool getGradoElevado();
 
 private:
 	///Private constructor
